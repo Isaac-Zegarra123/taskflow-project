@@ -1,33 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../services/api";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function Dashboard() {
+  const [tasks, setTasks] = useState([]);
+  const [title, setTitle] = useState("");
+  const [editingID, setEditingID] = useState(null);
 
-  const handleLogin = async () => {
-    const res = await API.post("/auth/login", { email, password });
-    localStorage.setItem("token", res.data.token);
-    alert("Login Correcto");
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    const res = await API.get("/tasks");
+    setTasks(res.data);
+  };
+
+  const createTask = async () => {
+    await API.post("/tasks", { title });
+    setTitle("");
+    loadTasks();
+  };
+
+  const deleteTask = async (id) => {
+    await API.delete(`/tasks/${id}`);
+    loadTasks();
+  };
+
+  const updateTask = async (id) => {
+    await API.put(`/tasks/${id}`, { title });
+    setEditingID(null);
+    loadTasks();
   };
 
   return (
     <div className="p-5">
-      <h2>Login</h2>
+      <h2>Dashboard</h2>
       <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Nueva Tarea"
       />
-      <input
-        type="password"
-        placeholder="password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <button onClick={handleLogin}>Ingresar</button>
+      <button onClick={createTask}>Agregar</button>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task._id}>
+            {task._id}
+            {editingID === task._id ? (
+              <>
+                <input onChange={(e) => setTitle(e.target.value)} />
+                <button onClick={() => updateTask(task._id)}>Guardar</button>
+              </>
+            ) : (
+              <>
+                {task.title}
+                <button onClick={() => setEditingID(task._id)}>Editar</button>
+                <button onClick={() => deleteTask(task._id)}>Eliminar</button>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-export default Login;
+export default Dashboard;
