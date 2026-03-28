@@ -7,7 +7,7 @@ function Register() {
   const [password, setPassword] = useState("");
 
   const handleRegister = async () => {
-    await API.post("/auth/register", { name, email, password });
+    await API.post("/api/auth/register", { name, email, password });
     alert("Usuario Creado");
   };
 
