@@ -11,23 +11,23 @@ function Dashboard() {
   }, []);
 
   const loadTasks = async () => {
-    const res = await API.get("/tasks");
+    const res = await API.get("/api/tasks");
     setTasks(res.data);
   };
 
   const createTask = async () => {
-    await API.post("/tasks", { title });
+    await API.post("/api/tasks", { title });
     setTitle("");
     loadTasks();
   };
 
   const deleteTask = async (id) => {
-    await API.delete(`/tasks/${id}`);
+    await API.delete(`/api/tasks/${id}`);
     loadTasks();
   };
 
   const updateTask = async (id) => {
-    await API.put(`/tasks/${id}`, { title });
+    await API.put(`/api/tasks/${id}`, { title });
     setEditingID(null);
     loadTasks();
   };
